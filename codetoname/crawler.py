@@ -6,23 +6,17 @@ import os
 import shutil
 
 from codetoname.features import extract_feature
-
-
-__language_dict = {
-	'python': '.py'
-}
+from codetoname.features.language import language_to_extension
 
 
 def fromgithub(query, language):
-	ext = __language_dict[language]
+	ext = language_to_extension(language)
+	tempdir = tempfile.mkdtemp(prefix=__name__)
+	print(tempdir)
 
 	try:
 		repo = github.Github().search_repositories(query=query)[0]
-
-		tempdir = tempfile.mkdtemp(prefix=__name__)
-		print(tempdir)
 		git.Repo.clone_from(url=repo.clone_url, to_path=tempdir, branch=repo.default_branch)
-
 		features = []
 		for r, d, fs in os.walk(tempdir):
 			for f in fs:
