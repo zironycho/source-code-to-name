@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+import os
 import ast
 import subprocess
+import tempfile
+
+from codetoname.features.language import language_to_extension
 
 
 def extract_feature(path):
@@ -15,6 +19,19 @@ def extract_feature(path):
 	return func_listener.get_func_features()
 
 
+def extract_feature_from_code(code):
+	ext = language_to_extension('python')
+	temp = tempfile.mktemp(prefix=__name__, suffix=ext)
+
+	with open(temp, 'wt') as f:
+		f.write(code)
+		f.close()
+
+	feature = extract_feature(temp)
+	os.remove(temp)
+	return feature
+
+
 def _parse_code(path, py2topy3=False):
 	if py2topy3:
 		popen = subprocess.Popen(['2to3', '-w', path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -22,7 +39,8 @@ def _parse_code(path, py2topy3=False):
 	try:
 		with open(path, 'rt') as f:
 			return ast.parse(f.read())
-	except SyntaxError:
+	except SyntaxError as e:
+		print(e)
 		return False
 
 

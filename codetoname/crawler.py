@@ -9,23 +9,26 @@ from codetoname.features import extract_feature
 from codetoname.features.language import language_to_extension
 
 
-def fromgithub(query, language):
+def fromgithub(query, language, repo_size=10):
 	ext = language_to_extension(language)
-	tempdir = tempfile.mkdtemp(prefix=__name__)
-	print('temp dir: {}'.format(tempdir))
-
+	tempdirs = []
 	try:
-		repo = github.Github().search_repositories(query=query)[0]
-		git.Repo.clone_from(url=repo.clone_url, to_path=tempdir, branch=repo.default_branch)
 		features = []
-		for r, d, fs in os.walk(tempdir):
-			for f in fs:
-				if f.endswith(ext):
-					features += fromfile(os.path.join(r, f))
+		repos = github.Github().search_repositories(query=query)[0:repo_size]
+		for repo in repos:
+			tempdir = tempfile.mkdtemp(prefix=__name__)
+			tempdirs.append(tempdir)
+			print('temp dir: {}'.format(tempdir))
+			git.Repo.clone_from(url=repo.clone_url, to_path=tempdir, branch=repo.default_branch)
+			for r, d, fs in os.walk(tempdir):
+				for f in fs:
+					if f.endswith(ext):
+						features += fromfile(os.path.join(r, f))
 	finally:
-		shutil.rmtree(tempdir, ignore_errors=True)
+		for tempdir in tempdirs:
+			shutil.rmtree(tempdir, ignore_errors=True)
 
-	return features
+	return features, [r.clone_url for r in repos]
 
 
 def fromfile(filename):

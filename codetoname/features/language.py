@@ -6,7 +6,6 @@ __languages = {
 }
 
 
-@property
 def support_languages():
 	return __languages.keys()
 
