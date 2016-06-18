@@ -12,7 +12,7 @@ from codetoname.features.language import language_to_extension
 def fromgithub(query, language):
 	ext = language_to_extension(language)
 	tempdir = tempfile.mkdtemp(prefix=__name__)
-	print(tempdir)
+	print('temp dir: {}'.format(tempdir))
 
 	try:
 		repo = github.Github().search_repositories(query=query)[0]

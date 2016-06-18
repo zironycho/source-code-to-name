@@ -17,8 +17,8 @@ def extract_feature(path):
 
 def _parse_code(path, py2topy3=False):
 	if py2topy3:
-		subprocess.Popen(['2to3', '-w', path], stdout=subprocess.PIPE).communicate()
-
+		popen = subprocess.Popen(['2to3', '-w', path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+		popen.communicate()
 	try:
 		with open(path, 'rt') as f:
 			return ast.parse(f.read())
