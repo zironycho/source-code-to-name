@@ -9,27 +9,39 @@ from codetoname.features import extract_feature
 from codetoname.features.language import language_to_extension
 
 
-def fromgithub(query, language, repo_size=10):
-	ext = language_to_extension(language)
-	tempdirs = []
-	try:
-		features = []
-		repos = github.Github().search_repositories(query=query)[0:repo_size]
-		for repo in repos:
-			tempdir = tempfile.mkdtemp(prefix=__name__)
-			tempdirs.append(tempdir)
-			print('temp dir: {}'.format(tempdir))
-			git.Repo.clone_from(url=repo.clone_url, to_path=tempdir, branch=repo.default_branch)
-			for r, d, fs in os.walk(tempdir):
-				for f in fs:
-					if f.endswith(ext):
-						features += fromfile(os.path.join(r, f))
-	finally:
-		for tempdir in tempdirs:
-			shutil.rmtree(tempdir, ignore_errors=True)
-
-	return features, [r.clone_url for r in repos]
+def fetch_github_repos(query, repo_size=10, repo_page=0):
+    start_offset = repo_size * repo_page
+    end_offset = start_offset + repo_size
+    repos = github.Github().search_repositories(query=query)[start_offset:end_offset]
+    return [{'url': r.clone_url, 'branch': r.default_branch, 'id': r.id} for r in repos]
 
 
-def fromfile(filename):
-	return extract_feature(filename)
+def from_gitrepo(gitrepo, language):
+    paths = []
+    features = []
+    ext = language_to_extension(language)
+    try:
+        for repo in gitrepo:
+            if ('url' not in repo) or not repo['url']:
+                continue
+
+            kwargs = {}
+            if 'branch' in repo:
+                kwargs['branch'] = repo['branch']
+
+            paths.append(tempfile.mkdtemp(prefix=__name__))
+            print('temp dir: {}'.format(paths[-1]))
+            git.Repo.clone_from(url=repo['url'], to_path=paths[-1], **kwargs)
+            for r, d, fs in os.walk(paths[-1]):
+                for f in fs:
+                    if f.endswith(ext):
+                        features += from_file(os.path.join(r, f))
+    finally:
+        for path in paths:
+            shutil.rmtree(path, ignore_errors=True)
+
+    return features, len(paths)
+
+
+def from_file(filename):
+    return extract_feature(filename)
