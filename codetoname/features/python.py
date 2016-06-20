@@ -34,21 +34,20 @@ def extract_feature_from_code(code):
 
 def _parse_code(path, py2topy3=False):
     if py2topy3:
-        popen = subprocess.Popen(['2to3', '-w', path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        popen.communicate()
+        p = subprocess.Popen(['2to3', '-w', path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        p.communicate()
     try:
         with open(path, 'rt') as f:
             return ast.parse(f.read())
-    except SyntaxError as e:
-        print(e)
-        return False
+    except SyntaxError:
+        pass
     except UnicodeDecodeError as e:
         print(path)
         print(e)
     except FileNotFoundError as e:
         print(path)
         print(e)
-        return False
+    return False
 
 
 class FuncListener(ast.NodeVisitor):
