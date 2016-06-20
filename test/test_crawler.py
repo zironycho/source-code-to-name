@@ -31,12 +31,11 @@ class TestCrawler(unittest.TestCase):
     def test_fetch_github_repos(self):
         repos = codetoname.crawler.fetch_github_repos('python', repo_page=0)
         self.assertEqual(10, len(repos))
-
-        found = False
-        for url in repos:
-            if url['url'] == 'https://github.com/jkbrzt/httpie.git':
-                found = True
-        self.assertTrue(found)
+        self.assertIn('url', repos[0])
+        self.assertIn('branch', repos[0])
+        self.assertIn('github_id', repos[0])
+        self.assertIn('fork', repos[0])
+        self.assertIn('https://github.com/jkbrzt/httpie.git', [r['url'] for r in repos])
 
         next_repos = codetoname.crawler.fetch_github_repos('python', repo_page=1, repo_size=15)
 
