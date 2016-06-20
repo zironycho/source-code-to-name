@@ -4,7 +4,7 @@ import codetoname
 
 
 class TestCrawler(unittest.TestCase):
-    def test_from_gitrepo_one(self):
+    def test_from_gitrepo_none(self):
         features, num_processing = codetoname.crawler.from_gitrepo([], 'python')
         self.assertFalse(features)
 
