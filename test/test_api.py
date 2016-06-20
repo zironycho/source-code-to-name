@@ -14,10 +14,6 @@ class TestApi(unittest.TestCase):
         self.assertFalse(codetoname.getname('', ''))
 
     def test_getname(self):
-
-        code_block =\
-            """
-def unknown_name():
-    return a
-            """
-        self.assertEqual('get_a', codetoname.getname(code_block, 'python'))
+        with open('./test/samples/get_a.txt', 'rt') as f:
+            code_block = f.read()
+            self.assertEqual('get_a', codetoname.getname(code_block, 'python'))
