@@ -29,12 +29,19 @@ class TestCrawler(unittest.TestCase):
         self.assertTrue(features)
 
     def test_fetch_github_repos(self):
-        urls = codetoname.crawler.fetch_github_repos('python', repo_page=0, repo_size=10)
-        self.assertEqual(10, len(urls))
-        next_urls = codetoname.crawler.fetch_github_repos('python', repo_page=1, repo_size=10)
+        repos = codetoname.crawler.fetch_github_repos('python', repo_page=0)
+        self.assertEqual(10, len(repos))
+
+        found = False
+        for url in repos:
+            if url['url'] == 'https://github.com/jkbrzt/httpie.git':
+                found = True
+        self.assertTrue(found)
+
+        next_repos = codetoname.crawler.fetch_github_repos('python', repo_page=1, repo_size=15)
 
         the_same = True
-        for u in next_urls:
-            if u not in urls:
+        for u in next_repos:
+            if u not in repos:
                 the_same = False
         self.assertFalse(the_same)
