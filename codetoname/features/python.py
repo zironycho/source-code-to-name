@@ -42,6 +42,13 @@ def _parse_code(path, py2topy3=False):
     except SyntaxError as e:
         print(e)
         return False
+    except UnicodeDecodeError as e:
+        print(path)
+        print(e)
+    except FileNotFoundError as e:
+        print(path)
+        print(e)
+        return False
 
 
 class FuncListener(ast.NodeVisitor):
