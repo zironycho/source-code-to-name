@@ -58,6 +58,8 @@ class FuncListener(ast.NodeVisitor):
         self.funcs.append({
             'name': node.name,
             'body': [line.__class__.__name__ for line in node.body],
+            'args': [item.arg for item in node.args.args],
+            'cls': node
         })
         self.generic_visit(node)
 
