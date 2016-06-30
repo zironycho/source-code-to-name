@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import unittest
 from codetoname import features
 
@@ -21,3 +22,4 @@ class TestFeature(unittest.TestCase):
         self.assertEqual(2, len(feat[0]['body']))
         self.assertEqual('Expr', feat[0]['body'][0])
         self.assertEqual('Return', feat[0]['body'][1])
+        self.assertTrue(json.dumps(feat[0]))

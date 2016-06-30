@@ -3,6 +3,7 @@ import os
 import ast
 import subprocess
 import tempfile
+from ast2json import ast2json
 
 from codetoname.features.language import language_to_extension
 
@@ -59,7 +60,7 @@ class FuncListener(ast.NodeVisitor):
             'name': node.name,
             'body': [line.__class__.__name__ for line in node.body],
             'args': [item.arg for item in node.args.args],
-            'cls': node
+            'cls': ast2json(node)
         })
         self.generic_visit(node)
 
