@@ -23,3 +23,8 @@ class TestFeature(unittest.TestCase):
         self.assertEqual('Expr', feat[0]['body'][0])
         self.assertEqual('Return', feat[0]['body'][1])
         self.assertTrue(json.dumps(feat[0]))
+
+    def test_feature_name_none_camelcase(self):
+        feat = features.extract_feature('./test/samples/one_function_camelcase.py')
+        self.assertTrue(feat)
+        self.assertEqual('get_wsgi_application', feat[0]['name'])
