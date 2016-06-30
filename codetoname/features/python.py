@@ -4,6 +4,7 @@ import ast
 import subprocess
 import tempfile
 from ast2json import ast2json
+import inflection
 
 from codetoname.features.language import language_to_extension
 
@@ -57,7 +58,7 @@ class FuncListener(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node):
         self.funcs.append({
-            'name': node.name,
+            'name': inflection.underscore(node.name),
             'body': [line.__class__.__name__ for line in node.body],
             'args': [item.arg for item in node.args.args],
             'cls': ast2json(node)
