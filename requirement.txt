@@ -1,3 +1,4 @@
+-e git+https://github.com/zironycho/ast2json.git@c25c032f2f0381cc3dfc3afccb1bb508be2e61be#egg=ast2json-master
 elasticsearch==2.3.0
 elasticsearch-dsl==2.0.0
 gitdb==0.6.4
