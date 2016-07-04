@@ -1,8 +1,9 @@
--e git+https://github.com/zironycho/ast2json.git@c25c032f2f0381cc3dfc3afccb1bb508be2e61be#egg=ast2json-master
+-e git+https://github.com/zironycho/ast2json.git@e1bbf89bc6c6620e8906ee16e73e38e4b492038e#egg=ast2json-master
 elasticsearch==2.3.0
 elasticsearch-dsl==2.0.0
 gitdb==0.6.4
 GitPython==2.0.5
+inflection==0.3.1
 nose==1.3.7
 PyGithub==1.26.0
 python-dateutil==2.5.3

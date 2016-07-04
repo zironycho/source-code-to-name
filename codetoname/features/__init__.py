@@ -8,7 +8,7 @@ def extract_feature(path):
     if lang == 'python':
         return python.extract_feature(path)
     else:
-        raise Exception('Unsupported language')
+        raise Exception('Unsupported language: {}'.format(path))
 
 
 def extract_feature_from_code(code, language):
