@@ -3,7 +3,7 @@ import elasticsearch_dsl as es_dsl
 import json
 
 import codetoname
-from config import ES_CONFIG
+from tools.config import ES_CONFIG
 
 
 def main():
