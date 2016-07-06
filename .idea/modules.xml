@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/source-code-to-name.iml" filepath="$PROJECT_DIR$/.idea/source-code-to-name.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../source-code-to-name-training/.idea/source-code-to-name-training.iml" filepath="$PROJECT_DIR$/../source-code-to-name-training/.idea/source-code-to-name-training.iml" />
     </modules>
   </component>
 </project>
