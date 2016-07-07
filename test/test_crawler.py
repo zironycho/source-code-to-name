@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
+from getpass import getpass
 import unittest
 import codetoname
 
 
 class TestCrawler(unittest.TestCase):
+    def setUp(self):
+        self.crawler = codetoname.Crawler(index='codetoname-dev', page_num=0, page_size=1)
+
+    def tearDown(self):
+        self.crawler.delete_index()
+
     def test_fetch_github_repos(self):
         repos = codetoname.crawler.fetch_github_repos('python', repo_page=0)
         self.assertEqual(10, len(repos))
@@ -21,5 +28,11 @@ class TestCrawler(unittest.TestCase):
                 the_same = False
         self.assertFalse(the_same)
 
-    def test_crawler(self):
-        self.assertTrue(codetoname.crawler.Crawler())
+    def test_next(self):
+        self.crawler.create_index()
+        self.assertEqual(0, self.crawler.num_features())
+        self.crawler.next()
+        num_features = self.crawler.num_features()
+        self.assertNotEqual(0, num_features)
+        self.crawler.next()
+        self.assertLess(num_features, self.crawler.num_features())
