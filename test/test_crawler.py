@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from getpass import getpass
 import unittest
 import codetoname
 

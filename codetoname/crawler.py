@@ -8,20 +8,27 @@ import github
 from codetoname.features import from_repo
 
 
-def fetch_github_repos(language, repo_size=10, repo_page=0):
+def fetch_github_repos(language, repo_size=10, repo_page=0, account=None, password=None):
     start_offset = repo_size * repo_page
     end_offset = start_offset + repo_size
-    repos = github.Github().search_repositories(query='language:{}'.format(language.strip()))
+
+    if account and password:
+        github_client = github.Github(login_or_token=account, password=password)
+    else:
+        github_client = github.Github()
+    repos = github_client.search_repositories(query='language:{}'.format(language.strip()))
     repos = repos[start_offset:end_offset]
     return [{'url': r.clone_url, 'branch': r.default_branch, 'github_id': r.id, 'fork': r.fork} for r in repos]
 
 
 class Crawler:
-    def __init__(self, index='codetoname', page_num=0, page_size=10):
+    def __init__(self, index='codetoname', page_num=0, page_size=10, account=None, password=None):
         self._es = elasticsearch.Elasticsearch()
         self._es_index = index
         self._page_num = page_num
         self._page_size = page_size
+        self._account = account
+        self._password = password
 
     def delete_index(self):
         if self._es.indices.exists(index=self._es_index):
@@ -31,14 +38,14 @@ class Crawler:
         if not self._es.indices.exists(index=self._es_index):
             self._es.indices.create(index=self._es_index)
 
-    def login_github(self, account='', password=''):
-        pass
-
     def next(self):
         self.create_index()
 
         language = 'python'
-        for repo in fetch_github_repos(language=language, repo_size=self._page_size, repo_page=self._page_num):
+        repos = fetch_github_repos(language=language,
+                                   repo_size=self._page_size, repo_page=self._page_num,
+                                   account=self._account, password=self._password)
+        for repo in repos:
             if 0 != elasticsearch_dsl\
                     .Search(using=self._es, index=self._es_index, doc_type=language)\
                     .query('term', github_id=repo['github_id'])\
