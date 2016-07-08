@@ -13,7 +13,7 @@ def fetch_github_repos(language, repo_size=10, repo_page=0, account=None, passwo
     end_offset = start_offset + repo_size
 
     if account and password:
-        github_client = github.Github(login_or_token=account, password=password)
+        github_client = github.Github(account, password)
     else:
         github_client = github.Github()
     repos = github_client.search_repositories(query='language:{}'.format(language.strip()))
