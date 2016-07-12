@@ -4,12 +4,6 @@ import codetoname
 
 
 class TestApi(unittest.TestCase):
-    def setUp(self):
-        pass
-    
-    def tearDown(self):
-        pass
-
     def test_getname_with_empty_code(self):
         self.assertFalse(codetoname.getname('', ''))
 

@@ -52,6 +52,13 @@ def _parse_code(path, py2topy3=False):
     return False
 
 
+def firstname(name):
+    for s in name.split('_'):
+        if s != '':
+            return s
+    return ''
+
+
 class FuncListener(ast.NodeVisitor):
     def __init__(self):
         self.funcs = []
@@ -67,3 +74,4 @@ class FuncListener(ast.NodeVisitor):
 
     def get_func_features(self):
         return self.funcs
+

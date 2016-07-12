@@ -22,7 +22,14 @@ def extract_feature_from_code(code, language):
     if language == 'python':
         return python.extract_feature_from_code(code)
     else:
-        raise Exception('Unsupported language')
+        raise Exception('Unsupported language: {}'.format(language))
+
+
+def firstname(name, language):
+    if language == 'python':
+        return python.firstname(name)
+    else:
+        raise Exception('Unsupported language: {}'.format(language))
 
 
 def from_repo(repo, language):

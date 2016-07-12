@@ -45,3 +45,8 @@ class TestFeature(unittest.TestCase):
     def test_fromfile(self):
         features = codetoname.features.from_file('./test/samples/one_function.py')
         self.assertTrue(features)
+
+    def test_firstname(self):
+        self.assertEqual('hello', codetoname.features.firstname('_hello_', 'python'))
+        self.assertEqual('', codetoname.features.firstname('_', 'python'))
+        self.assertEqual('hello', codetoname.features.firstname('hello', 'python'))
