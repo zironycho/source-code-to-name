@@ -13,8 +13,8 @@ def first_words(index='codetoname', language='python'):
     es = elasticsearch.Elasticsearch()
 
     # update first name
-    s = elasticsearch_dsl.Search(using=es, index=index, doc_type=language)
-    s.query('constant_score', filter=Q('missing', field='first_name'))
+    s = elasticsearch_dsl.Search(using=es, index=index, doc_type=language)\
+        .query('bool', filter=Q('exists', field='feature') & Q('missing', field='first_name'))
     for hit in s.scan():
         data = hit.to_dict()
         feature = json.loads(data['feature'])
@@ -23,7 +23,8 @@ def first_words(index='codetoname', language='python'):
     es.indices.refresh(index=index)
 
     # aggregation
-    s = elasticsearch_dsl.Search(using=es, index=index, doc_type=language)
+    s = elasticsearch_dsl.Search(using=es, index=index, doc_type=language)\
+        .query('bool', filter=Q('exists', field='feature'))
     a = A('terms', field='first_name')
     s.aggs.bucket('first_name_terms', a)
     response = s.execute()

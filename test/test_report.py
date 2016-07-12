@@ -17,6 +17,7 @@ class TestReport(unittest.TestCase):
         self.es.index(index=self.index, doc_type='python', body={'feature': json.dumps({'name': 'hello'})})
         self.es.index(index=self.index, doc_type='python', body={'feature': json.dumps({'name': 'hello_my_function'})})
         self.es.index(index=self.index, doc_type='python', body={'feature': json.dumps({'name': 'not_hello'})})
+        self.es.index(index=self.index, doc_type='python', body={'no': 'no...'})
         self.es.indices.refresh(index=self.index)
 
     def tearDown(self):
