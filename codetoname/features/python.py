@@ -16,7 +16,7 @@ def extract_feature(path):
         if not code_tree:
             return []
 
-    func_listener = FuncListener()
+    func_listener = __FuncListener()
     func_listener.visit(node=code_tree)
     return func_listener.get_func_features()
 
@@ -59,18 +59,22 @@ def firstname(name):
     return ''
 
 
-class FuncListener(ast.NodeVisitor):
+class __FuncListener(ast.NodeVisitor):
     def __init__(self):
         self.funcs = []
 
     def visit_FunctionDef(self, node):
-        self.funcs.append({
-            'name': inflection.underscore(node.name),
-            'body': [line.__class__.__name__ for line in node.body],
-            'args': [item.arg for item in node.args.args],
-            'cls': ast2json(node)
-        })
-        self.generic_visit(node)
+        underscore_name = inflection.underscore(node.name)
+        if underscore_name.startswith('__') and underscore_name.endswith('__'):
+            self.generic_visit(node)
+        else:
+            self.funcs.append({
+                'name': underscore_name,
+                'body': [line.__class__.__name__ for line in node.body],
+                'args': [item.arg for item in node.args.args],
+                'cls': ast2json(node)
+            })
+            self.generic_visit(node)
 
     def get_func_features(self):
         return self.funcs

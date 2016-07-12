@@ -50,3 +50,8 @@ class TestFeature(unittest.TestCase):
         self.assertEqual('hello', codetoname.features.firstname('_hello_', 'python'))
         self.assertEqual('', codetoname.features.firstname('_', 'python'))
         self.assertEqual('hello', codetoname.features.firstname('hello', 'python'))
+
+    def test_ignore_class_builtin_methods(self):
+        feature = codetoname.features.extract_feature('./test/samples/class_builtin_methods.py')
+        self.assertEqual(1, len(feature))
+        self.assertEqual('nested_method', feature[0]['name'])
