@@ -35,3 +35,9 @@ class TestCrawler(unittest.TestCase):
         self.assertNotEqual(0, num_features)
         self.crawler.next()
         self.assertLess(num_features, self.crawler.num_features())
+
+    def test_num_repos(self):
+        self.crawler.next()
+        self.assertEqual(1, self.crawler.num_repos('python'))
+        self.crawler.next()
+        self.assertEqual(2, self.crawler.num_repos('python'))

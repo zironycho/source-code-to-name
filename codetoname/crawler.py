@@ -4,6 +4,7 @@ import json
 import elasticsearch
 import elasticsearch_dsl
 import github
+from elasticsearch_dsl.aggs import A
 
 from codetoname.features import from_repo
 
@@ -40,7 +41,6 @@ class Crawler:
 
     def next(self):
         self.create_index()
-
         language = 'python'
         repos = fetch_github_repos(language=language,
                                    repo_size=self._page_size, repo_page=self._page_num,
@@ -75,3 +75,11 @@ class Crawler:
 
     def num_features(self):
         return self._es.count(index=self._es_index)['count']
+
+    def num_repos(self, language):
+        if self._es.indices.exists(index=self._es_index):
+            s = elasticsearch_dsl.Search(using=self._es, index=self._es_index, doc_type=language)
+            s.aggs.bucket('num_repos', A('cardinality', field='repo.github_id'))
+            response = s.execute()
+            return response.aggregations.num_repos.value
+        return 0
