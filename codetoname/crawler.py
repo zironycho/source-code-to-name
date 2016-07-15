@@ -18,6 +18,7 @@ class Crawler:
         self._language = language
         if account and password:
             github_client = github.Github(account, password)
+            print('Hi, {}'.format(github_client.get_user().name))
         else:
             github_client = github.Github()
 
@@ -57,6 +58,7 @@ class Crawler:
     def next(self):
         self.create_index()
         for repo in self.fetch_github_repos():
+            print('[{:4d}] {}'.format(self._page_num, repo['url']))
             if not self.exists_repos_in_database(repo['github_id']):
                 try:
                     features = from_repo(repo, language=self._language)
