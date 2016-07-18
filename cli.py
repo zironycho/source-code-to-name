@@ -1,7 +1,12 @@
+import sys
 import click
 from getpass import getpass
 
+from codetoname import log
 from codetoname.crawler import Crawler
+
+# hooking log
+sys.excepthook = log.except_hooking
 
 
 @click.command()

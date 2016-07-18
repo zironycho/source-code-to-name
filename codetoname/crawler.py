@@ -6,6 +6,7 @@ import elasticsearch_dsl
 
 from elasticsearch_dsl.aggs import A
 from codetoname.features import from_repo
+from codetoname.log import get_logger
 
 
 class Crawler:
@@ -57,8 +58,9 @@ class Crawler:
 
     def next(self):
         self.create_index()
+        logger = get_logger()
         for repo in self.fetch_github_repos():
-            print('[{:4d}] {}'.format(self._page_num, repo['url']))
+            logger.info('[{:4d}] {}'.format(self._page_num, repo['url']))
             if not self.exists_repos_in_database(repo['github_id']):
                 try:
                     features = from_repo(repo, language=self._language)
@@ -75,9 +77,9 @@ class Crawler:
                             body={'repo': repo})
                     self._es.indices.refresh(index=self._es_index)
                 except Exception as e:
-                    print(repo)
-                    print(f) if f else None
-                    print(e)
+                    logger.error(repo)
+                    logger.error(f) if f else None
+                    logger.error(e)
 
     def exists_repos_in_database(self, github_id):
         if 0 != elasticsearch_dsl \
