@@ -3,9 +3,17 @@ import json
 import github
 import elasticsearch
 import elasticsearch_dsl
+import logging
 
 from elasticsearch_dsl.aggs import A
 from codetoname.features import from_repo
+
+logger = logging.getLogger(__package__)
+handler = logging.FileHandler('crawler.log')
+formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
 
 
 class Crawler:
@@ -58,7 +66,7 @@ class Crawler:
     def next(self):
         self.create_index()
         for repo in self.fetch_github_repos():
-            print('[{:4d}] {}'.format(self._page_num, repo['url']))
+            logger.info('[{:4d}] {}'.format(self._page_num, repo['url']))
             if not self.exists_repos_in_database(repo['github_id']):
                 try:
                     features = from_repo(repo, language=self._language)
@@ -75,9 +83,9 @@ class Crawler:
                             body={'repo': repo})
                     self._es.indices.refresh(index=self._es_index)
                 except Exception as e:
-                    print(repo)
-                    print(f) if f else None
-                    print(e)
+                    logger.error(repo)
+                    logger.error(f) if f else None
+                    logger.error(e)
 
     def exists_repos_in_database(self, github_id):
         if 0 != elasticsearch_dsl \
