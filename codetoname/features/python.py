@@ -3,9 +3,9 @@ import os
 import ast
 import subprocess
 import tempfile
-from ast2json import ast2json
 import inflection
 
+from ast2json import ast2json
 from codetoname.features.language import language_to_extension
 
 
