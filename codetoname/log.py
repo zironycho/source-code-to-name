@@ -1,4 +1,5 @@
 import logging
+from traceback import format_exception
 
 
 def get_logger():
@@ -13,5 +14,4 @@ def get_logger():
 
 def except_hooking(exc_type, exc_value, traceback):
     logger = get_logger()
-    logger.critical('Type: {}, Value: {}'.format(exc_type, exc_value))
-    logger.critical('Traceback: {}'.format(traceback))
+    logger.critical(format_exception(exc_type, exc_value, traceback))
