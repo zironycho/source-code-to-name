@@ -15,7 +15,9 @@ def language_to_extension(language):
 
 
 def path_to_language(path):
-    ext = os.path.splitext(path)[1]
+    filename, ext = os.path.splitext(os.path.basename(path))
+    ext = (ext if ext else filename)
+
     for k, v in __languages.items():
         if v == ext:
             return k

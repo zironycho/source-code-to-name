@@ -58,10 +58,11 @@ class Crawler:
 
     def next(self):
         self.create_index()
-        logger = get_logger()
+        log = get_logger()
         for repo in self.fetch_github_repos():
-            logger.info('[{:4d}] {}'.format(self._page_num, repo['url']))
+            log.info('[{:4d}] {}'.format(self._page_num, repo['url']))
             if not self.exists_repos_in_database(repo['github_id']):
+                f = None  # don't remove this line, it is used for exception handling
                 try:
                     features = from_repo(repo, language=self._language)
                     for f in features:
@@ -77,9 +78,9 @@ class Crawler:
                             body={'repo': repo})
                     self._es.indices.refresh(index=self._es_index)
                 except Exception as e:
-                    logger.error(repo)
-                    logger.error(f) if f else None
-                    logger.error(e)
+                    log.error(repo)
+                    log.error(e)
+                    log.error(f) if f else None
 
     def exists_repos_in_database(self, github_id):
         if 0 != elasticsearch_dsl \
