@@ -5,8 +5,8 @@ import elasticsearch
 import elasticsearch_dsl
 
 from elasticsearch_dsl.aggs import A
-from codetoname.features import from_repo
-from codetoname.log import get_logger
+from .features import from_repo
+from .log import get_logger
 
 
 class Crawler:
