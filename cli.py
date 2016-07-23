@@ -1,7 +1,8 @@
 import sys
 import click
-from getpass import getpass
+import humanize
 
+from getpass import getpass
 from codetoname import log
 from codetoname.crawler import Crawler
 
@@ -25,3 +26,13 @@ def cli_crawler(begin, end, size):
 
     for i in range(begin, end):
         client.next()
+
+
+@click.command()
+def cli_total_repos():
+    print(humanize.intcomma(Crawler().num_repos()))
+
+
+@click.command()
+def cli_total_features():
+    print(humanize.intcomma(Crawler().num_features()))

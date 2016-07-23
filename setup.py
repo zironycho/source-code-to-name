@@ -10,5 +10,7 @@ setup(
     entry_points='''
         [console_scripts]
         codetoname-crawler=cli:cli_crawler
+        codetoname-total-repo=cli:cli_total_repos
+        codetoname-total-feat=cli:cli_total_features
     ''',
 )
