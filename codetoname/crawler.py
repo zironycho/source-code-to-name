@@ -10,22 +10,27 @@ from .log import get_logger
 
 
 class Crawler:
-    def __init__(self, index='codetoname', page_num=0, page_size=10,
+    def __init__(self, index='codetoname', page_num=0, page_size=30,
                  language='python', account=None, password=None):
         self._es = elasticsearch.Elasticsearch()
         self._es_index = index
         self._page_num = page_num
         self._page_size = page_size
         self._language = language
+        self._total_page_num = 0
         if account and password:
-            github_client = github.Github(account, password)
+            github_client = github.Github(account, password, per_page=page_size)
             print('Hi, {}'.format(github_client.get_user().name))
         else:
-            github_client = github.Github()
+            github_client = github.Github(per_page=page_size)
 
+        self._github_client = github_client
         self._github_response = github_client.search_repositories(
-            query='language:{}'.format(self._language.strip()))
+            query='language:{}'.format(self._language.strip()),
+            sort='stars'
+        )
 
+        self._latest_repo_stars = self._github_response[0].stargazers_count
         self._latest_repo_index = False
 
     def delete_index(self):
@@ -36,11 +41,7 @@ class Crawler:
         if not self._es.indices.exists(index=self._es_index):
             self._es.indices.create(index=self._es_index)
 
-    def fetch_github_repos(self, page_size=None):
-        # update page size
-        if page_size:
-            self._page_size = page_size
-
+    def fetch_github_repos(self):
         # calculate new start-end indices
         if self._latest_repo_index:
             start_index = self._latest_repo_index
@@ -54,13 +55,26 @@ class Crawler:
 
         # fetch
         repos = self._github_response[start_index:end_index]
+        if [r for r in repos]:
+            self._latest_repo_index = 0
+            self._page_num = 0
+            start_index = 0
+            end_index = self._page_size
+            self._github_response = self._github_client.search_repositories(
+                query='language:{} stars:<={}'.format(self._language.strip(), self._latest_repo_stars),
+                sort='stars'
+            )
+        repos = self._github_response[start_index:end_index]
+        for r in repos:
+            self._latest_repo_stars = min(r.stargazers_count, self._latest_repo_stars)
         return [{'url': r.clone_url, 'branch': r.default_branch, 'github_id': r.id, 'fork': r.fork} for r in repos]
 
     def next(self):
         self.create_index()
+        self._total_page_num += 1
         log = get_logger()
         for repo in self.fetch_github_repos():
-            log.info('[{:4d}] {}'.format(self._page_num, repo['url']))
+            log.info('[{:4d}] {}'.format(self._total_page_num, repo['url']))
             if not self.exists_repos_in_database(repo['github_id']):
                 f = None  # don't remove this line, it is used for exception handling
                 try:
