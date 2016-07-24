@@ -3,7 +3,7 @@ import click
 import humanize
 
 from getpass import getpass
-from codetoname import log
+from codetoname import log, report
 from codetoname.crawler import Crawler
 
 # hooking log
@@ -36,3 +36,9 @@ def cli_total_repos():
 @click.command()
 def cli_total_features():
     print(humanize.intcomma(Crawler().num_features()))
+
+
+@click.command()
+def cli_report_first_words():
+    for word in report.first_words():
+        print(word)

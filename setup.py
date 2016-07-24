@@ -12,5 +12,6 @@ setup(
         codetoname-crawler=cli:cli_crawler
         codetoname-total-repo=cli:cli_total_repos
         codetoname-total-feat=cli:cli_total_features
+        codetoname-first-words=cli:cli_report_first_words
     ''',
 )
