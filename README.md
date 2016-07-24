@@ -1,2 +1,5 @@
 # source-code-to-name
-I will start this project soon
+
+## set environments for test
+- github_account: your account for github
+- github_password: your password about github account
