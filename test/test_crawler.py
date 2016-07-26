@@ -27,6 +27,15 @@ class TestCrawler(unittest.TestCase):
         self.assertIn('fork', repos[0])
         self.assertIn('https://github.com/jkbrzt/httpie.git', [r['url'] for r in repos])
 
+        next_repos = self.crawler.fetch_github_repos()
+        self.assertEqual(2, len(next_repos))
+
+        the_same = True
+        for u in next_repos:
+            if u not in repos:
+                the_same = False
+        self.assertFalse(the_same)
+
     def test_next(self):
         self.crawler.create_index()
         self.assertEqual(0, self.crawler.num_features())
@@ -62,18 +71,6 @@ class TestCrawlerLimit(unittest.TestCase):
 
     def tearDown(self):
         self.crawler.delete_index()
-
-    def test_fetch_github_repos(self):
-        repos = self.crawler.fetch_github_repos()
-        self.assertEqual(30, len(repos))
-        next_repos = self.crawler.fetch_github_repos()
-        self.assertEqual(30, len(next_repos))
-
-        the_same = True
-        for u in next_repos:
-            if u not in repos:
-                the_same = False
-        self.assertFalse(the_same)
 
     def test_fetch_more_than_1000(self):
         for i in range(35):
