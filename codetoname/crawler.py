@@ -4,6 +4,7 @@ import github
 import elasticsearch
 import elasticsearch_dsl
 
+from datetime import datetime
 from elasticsearch_dsl.aggs import A
 from .features import from_repo
 from .log import get_logger
@@ -25,13 +26,10 @@ class Crawler:
             github_client = github.Github(per_page=page_size)
 
         self._github_client = github_client
-        self._github_response = github_client.search_repositories(
-            query='language:{}'.format(self._language.strip()),
-            sort='stars'
-        )
-
-        self._latest_repo_stars = self._github_response[0].stargazers_count
+        self._github_response = None
+        self._latest_repo_updated = None
         self._latest_repo_index = False
+        self._update_searching_response()
 
     def delete_index(self):
         if self._es.indices.exists(index=self._es_index):
@@ -40,6 +38,20 @@ class Crawler:
     def create_index(self):
         if not self._es.indices.exists(index=self._es_index):
             self._es.indices.create(index=self._es_index)
+
+    def _update_searching_response(self):
+        if not self._latest_repo_updated:
+            self._latest_repo_updated = datetime.utcnow()
+
+        date = self._latest_repo_updated.isoformat().split('.')[0]
+        query = 'fork:false language:{} pushed:<={}'.format(
+            self._language.strip(), date)
+
+        # language:python fork:false updated:<=2016-07-28T13:37:01.262955
+        self._github_response = self._github_client.search_repositories(
+            query=query,
+            sort='updated',
+            order='desc')
 
     def fetch_github_repos(self):
         # calculate new start-end indices
@@ -54,20 +66,21 @@ class Crawler:
         self._page_num += 1
 
         # fetch
-        repos = self._github_response[start_index:end_index]
-        if [r for r in repos]:
-            self._latest_repo_index = 0
+        repos = list(self._github_response[start_index:end_index])
+        if not repos:
             self._page_num = 0
+            self._latest_repo_index = 0
+            self._update_searching_response()
+
             start_index = 0
             end_index = self._page_size
-            self._github_response = self._github_client.search_repositories(
-                query='language:{} stars:<={}'.format(self._language.strip(), self._latest_repo_stars),
-                sort='stars'
-            )
-        repos = self._github_response[start_index:end_index]
+            repos = list(self._github_response[start_index:end_index])
+
+        ret = []
         for r in repos:
-            self._latest_repo_stars = min(r.stargazers_count, self._latest_repo_stars)
-        return [{'url': r.clone_url, 'branch': r.default_branch, 'github_id': r.id, 'fork': r.fork} for r in repos]
+            self._latest_repo_updated = min(self._latest_repo_updated, r.updated_at)
+            ret.append({'url': r.clone_url, 'branch': r.default_branch, 'github_id': r.id, 'fork': r.fork})
+        return ret
 
     def next(self):
         self.create_index()
